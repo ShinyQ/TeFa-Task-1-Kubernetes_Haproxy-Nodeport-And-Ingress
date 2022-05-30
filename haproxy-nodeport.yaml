@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: haproxy-nodeport
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: haproxy-nodeport
+  template:
+    metadata:
+      name: haproxy-nodeport
+      labels:
+        name: haproxy-nodeport
+    spec:
+      containers:
+        - name: haproxy-nodeport
+          image: shinyq11/haproxy
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-service-nodeport
+spec:
+  type: NodePort
+  selector:
+    name: haproxy-nodeport
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30001

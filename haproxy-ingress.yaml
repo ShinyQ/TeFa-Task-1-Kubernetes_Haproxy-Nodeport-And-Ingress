@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: haproxy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: haproxy
+  template:
+    metadata:
+      name: haproxy
+      labels:
+        name: haproxy
+    spec:
+      containers:
+        - name: haproxy
+          image: nginx
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-service
+spec:
+  selector:
+    name: haproxy
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: haproxy-ingress
+  labels:
+    name: haproxy-ingress
+spec:
+  rules:
+  - host: haproxy.kurniadi.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: haproxy-service
+            port: 
+              number: 80
